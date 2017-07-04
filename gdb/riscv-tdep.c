@@ -1276,6 +1276,7 @@ riscv_gdbarch_init (struct gdbarch_info info,
   set_gdbarch_register_reggroup_p (gdbarch, riscv_register_reggroup_p);
 
   /* Functions to analyze frames.  */
+  set_gdbarch_decr_pc_after_break (gdbarch, 4);
   set_gdbarch_skip_prologue (gdbarch, riscv_skip_prologue);
   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
   set_gdbarch_frame_align (gdbarch, riscv_frame_align);
