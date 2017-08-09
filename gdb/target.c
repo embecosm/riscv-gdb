@@ -2245,6 +2245,9 @@ target_preopen (int from_tty)
 	error (_("Program not killed."));
     }
 
+  /* Invalidate all cached registers.  */
+  registers_changed ();
+
   /* Calling target_kill may remove the target from the stack.  But if
      it doesn't (which seems like a win for UDI), remove it now.  */
   /* Leave the exec target, though.  The user may be switching from a
