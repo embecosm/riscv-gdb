@@ -1,3 +1,7 @@
+2017-08-16  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* riscv-tdep.c (riscv_gdbarch_init): Set long double format.
+
 2017-08-09  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* target.c (target_preopen): Call registers_changed.
