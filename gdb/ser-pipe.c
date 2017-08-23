@@ -173,7 +173,8 @@ pipe_close (struct serial *scb)
 #endif
       if (wait_result == -1)
 	{
-	  kill (state->pid, SIGTERM);
+	  /* Terminate the task, and any other processes in the same group */
+	  kill (-state->pid, SIGTERM);
 #ifdef HAVE_WAITPID
 	  wait_to_die_with_timeout (state->pid, &status, SIGTERM_TIMEOUT);
 #endif
