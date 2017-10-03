@@ -31,6 +31,7 @@
 
 static timer_handler_func push_event;
 static handler_func fd_event;
+static handler_func error_fd_event;
 
 /* Event handling for ASYNC serial code.
 
@@ -76,6 +77,7 @@ reschedule (struct serial *scb)
 	  else
 	    {
 	      delete_file_handler (scb->fd);
+	      delete_file_handler (scb->error_fd);
 	      next_state = create_timer (0, push_event, scb);
 	    }
 	  break;
@@ -83,6 +85,7 @@ reschedule (struct serial *scb)
 	  if (scb->bufcnt == 0)
 	    {
 	      add_file_handler (scb->fd, fd_event, scb);
+	      add_file_handler (scb->error_fd, error_fd_event, scb);
 	      next_state = FD_SCHEDULED;
 	    }
 	  else
@@ -95,6 +98,7 @@ reschedule (struct serial *scb)
 	    {
 	      delete_timer (scb->async_state);
 	      add_file_handler (scb->fd, fd_event, scb);
+	      add_file_handler (scb->error_fd, error_fd_event, scb);
 	      next_state = FD_SCHEDULED;
 	    }
 	  else
@@ -142,6 +146,20 @@ run_async_handler_and_reschedule (struct serial *scb)
   /* Get ready for more, if not already closed.  */
   if (is_open)
     reschedule (scb);
+}
+
+static void ser_base_read_error_fd (struct serial *scb, int close_fd);
+
+/* ERROR_FD_EVENT: This is scheduled when the input FIFO is empty (and
+   there is no pending error).  As soon as data arrives on the error_fd,
+   it is forwarded to gdb's stderr. */
+
+static void
+error_fd_event (int error, void *context)
+{
+  struct serial *scb = (struct serial *) context;
+  ser_base_read_error_fd (scb, 0);
+  run_async_handler_and_reschedule (scb);
 }
 
 /* FD_EVENT: This is scheduled when the input FIFO is empty (and there
@@ -600,6 +618,7 @@ ser_base_async (struct serial *scb,
 	{
 	case FD_SCHEDULED:
 	  delete_file_handler (scb->fd);
+	  delete_file_handler (scb->error_fd);
 	  break;
 	case NOTHING_SCHEDULED:
 	  break;

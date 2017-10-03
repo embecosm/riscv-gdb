@@ -1,3 +1,11 @@
+2017-10-03  Edward Jones  <ed.jones@embecosm.com>
+
+	* ser-base.c (reschedule): Add file handlers for scb->error_fd
+	in places where file handlers are installed for scb->fd.
+	(error_fd_event): Added function to forward error input from
+	the serial line to gdb's stderr.
+	(ser_base_async): Delete file handler for scb->error_fd.
+
 2017-08-23  Edward Jones  <ed.jones@embecosm.com>
 
 	* ser-pipe.c (pipe_close): Send SIGTERM to process group for
